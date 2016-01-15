@@ -2,9 +2,6 @@ FROM freyrus/base-php7.0
 
 MAINTAINER gialac <gialacmail@gmail.com>
 
-
-EXPOSE 80
-
 # Clean up APT when done.
 USER root
 
@@ -17,3 +14,4 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 ADD .               /var/www
 WORKDIR             /var/www
 USER www-data
+EXPOSE 80
