@@ -3,8 +3,8 @@ FROM freyrus/base-php7.0
 MAINTAINER gialac <gialacmail@gmail.com>
 
 # install mongodb driver for php
-RUN pecl install mongodb
-RUN echo "extension=mongodb.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+RUN pecl install mongo
+RUN echo "extension=mongo.so" >> /etc/php/7.0/fpm/php.ini
 
 ADD .               /var/www
 WORKDIR             /var/www
