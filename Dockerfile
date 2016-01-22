@@ -17,5 +17,5 @@ EXPOSE 80
 # Clean up APT when done.
 USER root
 ADD vhost   /etc/nginx/sites-available/default
-RUN /etc/init.d/nginx restart
+#RUN /etc/init.d/nginx restart
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
