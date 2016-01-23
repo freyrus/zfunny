@@ -1,10 +1,10 @@
-FROM freyrus/base-php7.0
+FROM freyrus/base-php5.6
 
 MAINTAINER gialac <gialacmail@gmail.com>
 
 # install mongodb driver for php
 RUN pecl install mongo
-RUN echo "extension=mongo.so" >> /etc/php/7.0/fpm/php.ini
+RUN echo "extension=mongo.so" >> /etc/php5/fpm/php.ini
 
 ADD .               /var/www
 WORKDIR             /var/www
