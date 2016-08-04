@@ -1,42 +1,65 @@
 server {
     listen  80;
+    server_name localhost;
+    access_log /var/log/nginx/123allrecipes.com-access.log;
+    error_log  /var/log/nginx/123allrecipes.com-error.log error;
 
-    root /var/apps/zfunny/current/public;
+    root  /var/apps/vdt/123allrecipes.com;
     index index.php index.html index.htm;
 
-    # Make site accessible from http://set-ip-address.xip.io
-    server_name localhost;
+    gzip on;
+    gzip_disable "msie6";
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_types image/png image/gif image/jpeg application/javascript text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
-    access_log /var/log/nginx/localhost.com-access.log;
-    error_log  /var/log/nginx/localhost.com-error.log error;
+    client_body_buffer_size      3m;
+    client_header_buffer_size    16k;
+    large_client_header_buffers  8 8k;
+    fastcgi_buffers              512 16k;
+    fastcgi_buffer_size          512k;
+    fastcgi_busy_buffers_size    512k;
 
-    charset utf-8;
+    # Media: images, icons, video, audio, HTC
+    location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$ {
+        expires 1M;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+
+    # CSS and Javascript
+    location ~* \.(?:css|js)$ {
+        expires 1y;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+
+    location ~* ^/(uploads|public)/.*\.(php|php5)$ {
+        deny all;
+    }
+
+    location /public/ {
+        expires max;
+        log_not_found off;
+        access_log off;
+        add_header Access-Control-Allow-Origin *;
+        try_files $uri /$uri =404;
+    }
+
+    # nginx configuration
+    location /blog {
+        try_files $uri $uri/ /blog/index.php?$args;
+    }
 
     location / {
-        try_files $uri $uri/ /index.php?$query_string;
+        try_files $uri $uri/ /index.php?/$request_uri;
     }
 
-    location = /favicon.ico { log_not_found off; access_log off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-
-    error_page 404 /index.php;
-
-    # pass the PHP scripts to php5-fpm
-    # Note: \.php$ is susceptible to file upload attacks
-    # Consider using: "location ~ ^/(index|app|app_dev|config)\.php(/|$) {"
     location ~ \.php$ {
-        fastcgi_split_path_info ^(.+\.php)(/.+)$;
-        # With php5-fpm:
         fastcgi_pass unix:/run/php5-fpm.sock;
         fastcgi_index index.php;
-        include fastcgi_params;
         include fastcgi.conf;
-        fastcgi_param LARA_ENV local; # Environment variable for Laravel
-        fastcgi_param HTTPS off;
-    }
-
-    # Deny .htaccess file access
-    location ~ /\.ht {
-        deny all;
     }
 }
